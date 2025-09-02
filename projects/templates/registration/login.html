@@ -1,0 +1,106 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'تسجيل الدخول' %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-lock me-2"></i>
+                        {% trans 'تسجيل الدخول' %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% trans 'اسم المستخدم أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.' %}
+                        </div>
+                    {% endif %}
+
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% trans 'حسابك لا يملك صلاحية الوصول إلى هذه الصفحة. يرجى تسجيل الدخول بحساب آخر.' %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans 'يرجى تسجيل الدخول لرؤية هذه الصفحة.' %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'login' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">
+                                <i class="fas fa-user me-2"></i>
+                                {% trans 'اسم المستخدم' %}
+                            </label>
+                            <input type="text" name="username" class="form-control" id="id_username" required>
+                            <div class="invalid-feedback">
+                                {% trans 'يرجى إدخال اسم المستخدم' %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_password" class="form-label">
+                                <i class="fas fa-key me-2"></i>
+                                {% trans 'كلمة المرور' %}
+                            </label>
+                            <input type="password" name="password" class="form-control" id="id_password" required>
+                            <div class="invalid-feedback">
+                                {% trans 'يرجى إدخال كلمة المرور' %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                {% trans 'تسجيل الدخول' %}
+                            </button>
+                            <input type="hidden" name="next" value="{{ next }}">
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        {% trans 'للاستفسارات، يرجى التواصل مع مدير النظام' %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Enable form validation
+(function () {
+    'use strict'
+    
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

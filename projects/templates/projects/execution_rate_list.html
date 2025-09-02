@@ -1,0 +1,212 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{% trans 'معدلات التنفيذ' %}</h1>
+        <div>
+            <a href="{% url 'projects:execution_rate_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> {% trans 'إضافة جديد' %}
+            </a>
+            <a href="#" class="btn btn-success d-none" id="export-btn">
+                <i class="fas fa-file-export"></i> {% trans 'تصدير' %}
+            </a>
+            
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary">
+            <h5 class="mb-0">{% trans 'تصفية النتائج' %}</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="code" class="form-label">{% trans 'الرمز' %}</label>
+                    <input type="text" name="code" id="code" class="form-control" 
+                           placeholder="{% trans 'ابحث بالرمز' %}" value="{{ code_filter|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="project" class="form-label">{% trans 'اسم المشروع' %}</label>
+                    <input type="text" name="project" id="project" class="form-control" 
+                           placeholder="{% trans 'ابحث باسم المشروع' %}" value="{{ project_filter|default:'' }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="btn-group w-100" role="group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> {% trans 'تصفية' %}
+                        </button>
+                        <a href="{% url 'projects:execution_rate_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo"></i> {% trans 'إعادة تعيين' %}
+                        </a>
+                        {% if code_filter or project_filter %}
+                        <a href="{% url 'projects:execution_rate_export' %}?code={{ code_filter|urlencode }}&project={{ project_filter|urlencode }}" 
+                           class="btn btn-success" id="export-btn">
+                            <i class="fas fa-file-excel"></i> {% trans 'تصدير النتائج' %}
+                        </a>
+                        {% else %}
+                        <a href="{% url 'projects:execution_rate_export' %}" 
+                           class="btn btn-success" id="export-btn">
+                            <i class="fas fa-file-excel"></i> {% trans 'تصدير الكل' %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Execution Rates Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{% trans 'الرمز' %}</th>
+                            <th>{% trans 'المشروع' %}</th>
+                            <th class="text-center">{% trans 'نسبة التقدم' %}</th>
+                            <th class="text-center">{% trans 'نسبة الإنجاز المالي' %}</th>
+                            <th class="text-center">{% trans 'آخر تحديث' %}</th>
+                            <th class="text-center">{% trans 'إجراءات' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rate in execution_rates %}
+                        <tr>
+                            <td>{{ rate.project.code }}</td>
+                            <td>{{ rate.project.program }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-{% if rate.work_progress_percentage >= 70 %}success{% elif rate.work_progress_percentage >= 40 %}warning{% else %}danger{% endif %} text-dark" style="min-width: 70px; font-size: 0.9em; padding: 0.5em 0.8em;">
+                                    {{ rate.work_progress_percentage|default:0|floatformat:1 }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-{% if rate.financial_achievement_percentage >= 70 %}success{% elif rate.financial_achievement_percentage >= 40 %}warning{% else %}danger{% endif %} text-dark" style="min-width: 70px; font-size: 0.9em; padding: 0.5em 0.8em;">
+                                    {{ rate.financial_achievement_percentage|default:0|floatformat:1 }}%
+                                </span>
+                            </td>
+                            <td class="text-center">{{ rate.updated_at|date:'Y-m-d' }}</td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'projects:execution_rate_detail' rate.pk %}" 
+                                       class="btn btn-sm btn-info" 
+                                       data-bs-toggle="tooltip" 
+                                       title="{% trans 'عرض التفاصيل' %}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'projects:execution_rate_edit' rate.pk %}" 
+                                       class="btn btn-sm btn-warning" 
+                                       data-bs-toggle="tooltip" 
+                                       title="{% trans 'تعديل' %}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'projects:execution_rate_delete' rate.pk %}" 
+                                       class="btn btn-sm btn-danger" 
+                                       data-bs-toggle="tooltip" 
+                                       title="{% trans 'حذف' %}"
+                                       onclick="return confirm('{% trans 'هل أنت متأكد من رغبتك في حذف هذا السجل؟' %}')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <div class="alert alert-info">
+                                    {% trans 'لا توجد سجلات متاحة' %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update export button href with current filters
+$(document).ready(function() {
+    // Initialize progress bars
+    $('.progress-bar').each(function() {
+        const width = $(this).attr('aria-valuenow');
+        $(this).css('width', width + '%');
+    });
+    
+    // Update export button URL with current filters
+    function updateExportUrl() {
+        const code = $('#code').val();
+        const project = $('#project').val();
+        let url = '{% url "projects:execution_rate_export" %}';
+        
+        if (code || project) {
+            url += '?';
+            if (code) url += 'code=' + encodeURIComponent(code);
+            if (project) url += (code ? '&' : '') + 'project=' + encodeURIComponent(project);
+        }
+        
+        $('#export-btn').attr('href', url);
+    }
+    
+    // Update export URL when filters change
+    $('#code, #project').on('change keyup', function() {
+        updateExportUrl();
+    });
+    
+    // Initialize export URL
+    updateExportUrl();
+});
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+});
+
+// Export button functionality
+document.getElementById('export-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    // TODO: Implement export functionality
+    alert('{% trans "سيتم تنفيذ وظيفة التصدير قريباً" %}');
+});
+</script>
+{% endblock %}

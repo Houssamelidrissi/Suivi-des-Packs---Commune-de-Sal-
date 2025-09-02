@@ -1,0 +1,15 @@
+{% load i18n %}
+<div class="checkbox-group">
+    {% for group, options, index in widget.optgroups %}
+        {% for option in options %}
+            <div class="form-check form-check-inline">
+                <input type="checkbox" name="{{ widget.name }}" value="{{ option.value|stringformat:'s' }}" 
+                       class="form-check-input" id="{{ option.attrs.id }}" 
+                       {% if option.value in widget.value %}checked{% endif %}>
+                <label class="form-check-label me-3" for="{{ option.attrs.id }}">
+                    {{ option.label }}
+                </label>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>

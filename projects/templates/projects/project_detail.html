@@ -1,0 +1,707 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'تفاصيل المشروع' %} - {{ project.code }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header with Back Button and Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-right me-2"></i> {% trans 'العودة للقائمة' %}
+                </a>
+                <div>
+                    <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i> {% trans 'تعديل' %}
+                    </a>
+                    <a href="{% url 'projects:export_projects' %}" class="btn btn-info">
+                        <i class="fas fa-file-export me-1"></i> {% trans 'تصدير' %}
+                    </a>
+                </div>
+            </div>
+            <h1 class="h3 text-center my-4 text-primary">
+                <i class="fas fa-project-diagram me-2"></i> {% trans 'تفاصيل المشروع' %}
+                <span class="badge bg-primary">{{ project.code }}</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Project Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header p-0">
+                    <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">
+                                <i class="fas fa-info-circle me-1"></i> {% trans 'المعلومات الأساسية' %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">
+                                <i class="fas fa-clipboard-list me-1"></i> {% trans 'تفاصيل المشروع' %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="financial-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="financial" aria-selected="false">
+                                <i class="fas fa-money-bill-wave me-1"></i> {% trans 'المعلومات المالية' %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline" type="button" role="tab" aria-controls="timeline" aria-selected="false">
+                                <i class="fas fa-calendar-alt me-1"></i> {% trans 'الجدول الزمني' %}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="projectTabsContent">
+                        <!-- Basic Information Tab -->
+                        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'البرنامج' %}</h6>
+                                        <p class="h5">{{ project.program|default:'-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'المشاريع' %}</h6>
+                                        <p>{{ project.projects|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'المكان' %}</h6>
+                                        <p>{{ project.location|default:'-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'المقاطعة/الجماعة' %}</h6>
+                                        <p>{{ project.district|default:'-' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الرمز في تصميم التهيئة' %}</h6>
+                                        <p>{{ project.planning_code|default:'-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'المساحة' %}</h6>
+                                        <p>{{ project.area|default:'0.00' }} م²</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الأهداف التنموية' %}</h6>
+                                        <p>{{ project.development_goals|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Details Tab -->
+                        <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'مكونات المشروع' %}</h6>
+                                        <p>{{ project.components|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الفئة المستهدفة' %}</h6>
+                                        <p>{{ project.target_group|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'أهداف المشروع' %}</h6>
+                                        <p>{{ project.project_goals|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'وضعية العقار' %}</h6>
+                                        <p>{{ project.property_status|default:'-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الرسم العقاري' %}</h6>
+                                        <p>{{ project.property_drawing|default:'-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Information Tab -->
+                        <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="financial-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'كلفة تعبئة العقار' %}</h6>
+                                        <p class="h5">{{ project.property_prep_cost|default:'0.00' }} {% trans 'درهم' %}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الدراسات' %}</h6>
+                                        <p>{{ project.studies|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الإنجازات' %}</h6>
+                                        <p>{{ project.achievements|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'التكلفة التقديرية' %}</h6>
+                                        <p class="h4 text-primary">{{ project.estimated_cost|default:'0.00' }} {% trans 'درهم' %}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'الشركاء المحتملين' %}</h6>
+                                        <p>{{ project.potential_partners|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'مصادر التمويل المحتملة' %}</h6>
+                                        <p>{{ project.funding_sources|default:'-'|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Tab -->
+                        <div class="tab-pane fade" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'سنة الانطلاق' %}</h6>
+                                        <p class="h5">{{ project.start_year|default:'-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'المدة التقديرية' %}</h6>
+                                        <p>{{ project.estimated_duration|default:'0' }} {% trans 'شهر' %}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'سنوات التنفيذ' %}</h6>
+                                        <p>
+                                            {% if project.implementation_years %}
+                                                {{ project.implementation_years|join:"، " }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'سنوات الميزانية' %}</h6>
+                                        <p>
+                                            {% if project.budget_years %}
+                                                {{ project.budget_years|join:"، " }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'تاريخ الإنشاء' %}</h6>
+                                        <p>{{ project.created_at|date:"Y-m-d H:i" }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">{% trans 'آخر تحديث' %}</h6>
+                                        <p>{{ project.updated_at|date:"Y-m-d H:i" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Indicators -->
+                            <div class="mt-4">
+                                <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i> {% trans 'المؤشرات' %}</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body">
+                                                <h6 class="text-muted">{% trans 'المؤشر 1' %}</h6>
+                                                <p class="h5">{{ project.indicator_1|default:'-' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body">
+                                                <h6 class="text-muted">{% trans 'المؤشر 2' %}</h6>
+                                                <p class="h5">{{ project.indicator_2|default:'-' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body">
+                                                <h6 class="text-muted">{% trans 'المؤشر 3' %}</h6>
+                                                <p class="h5">{{ project.indicator_3|default:'-' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .nav-tabs .nav-link {
+        color: #495057;
+        border: 1px solid transparent;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+    }
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+        border-bottom: 3px solid #0d6efd;
+    }
+    .nav-tabs .nav-link:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set progress bar width from data attribute
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            const width = progressBar.getAttribute('data-width');
+            if (width !== null) {
+                progressBar.style.width = width + '%';
+            }
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Activate the first tab
+        var firstTabEl = document.querySelector('#projectTabs .nav-link');
+        if (firstTabEl) {
+            var firstTab = new bootstrap.Tab(firstTabEl);
+            firstTab.show();
+        }
+    });
+</script>
+{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline and Status Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> {% trans 'الجدول الزمني' %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-primary"><i class="fas fa-flag"></i></div>
+                            <div class="timeline-content">
+                                <h6>{% trans 'تاريخ البدء' %}</h6>
+                                <p class="text-muted">{{ project.start_date|date:'Y-m-d'|default:'-' }}</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-success"><i class="fas fa-check"></i></div>
+                            <div class="timeline-content">
+                                <h6>{% trans 'تاريخ الانتهاء المتوقع' %}</h6>
+                                <p class="text-muted">{{ project.expected_end_date|date:'Y-m-d'|default:'-' }}</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-warning"><i class="fas fa-tasks"></i></div>
+                            <div class="timeline-content">
+                                <h6>{% trans 'مرحلة التنفيذ الحالية' %}</h6>
+                                <p class="text-muted">{{ project.current_phase|default:'-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attachments Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-paperclip me-2"></i> {% trans 'المرفقات' %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if project.attachments.all %}
+                        <div class="list-group">
+                            {% for attachment in project.attachments.all %}
+                            <a href="{{ attachment.file.url }}" class="list-group-item list-group-item-action" target="_blank">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-file-pdf text-danger me-2"></i> {{ attachment.get_filename }}</span>
+                                    <span class="badge bg-light text-dark">{{ attachment.file.size|filesizeformat }}</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-inbox fa-3x mb-2"></i>
+                            <p class="mb-0">{% trans 'لا توجد مرفقات' %}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information Tabs -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="projectTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">
+                                <i class="fas fa-align-justify me-1"></i> {% trans 'الوصف' %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="objectives-tab" data-bs-toggle="tab" data-bs-target="#objectives" type="button" role="tab" aria-controls="objectives" aria-selected="false">
+                                <i class="fas fa-bullseye me-1"></i> {% trans 'الأهداف' %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab" aria-controls="progress" aria-selected="false">
+                                <i class="fas fa-chart-line me-1"></i> {% trans 'مستوى الإنجاز' %}
+                            </button>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="projectTabsContent">
+                        <!-- Description Tab -->
+                        <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <h5 class="mb-3">{% trans 'وصف المشروع' %}</h5>
+                            <div class="p-3 bg-light rounded">
+                                {{ project.description|linebreaks|default:'-' }}
+                            </div>
+                            
+                            <h5 class="mt-4 mb-3">{% trans 'النتائج المتوقعة' %}</h5>
+                            <div class="p-3 bg-light rounded">
+                                {{ project.expected_outcomes|linebreaks|default:'-' }}
+                            </div>
+                        </div>
+                        
+                        <!-- Objectives Tab -->
+                        <div class="tab-pane fade" id="objectives" role="tabpanel" aria-labelledby="objectives-tab">
+                            {% if project.objectives.all %}
+                                <ul class="list-group list-group-flush">
+                                    {% for objective in project.objectives.all %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <span class="badge bg-primary rounded-circle p-2">{{ forloop.counter }}</span>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">{{ objective.title }}</h6>
+                                                    <p class="mb-0 text-muted">{{ objective.description }}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                                    <p class="mb-0">{% trans 'لا توجد أهداف محددة لهذا المشروع' %}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Progress Tab -->
+                        <div class="tab-pane fade" id="progress" role="tabpanel" aria-labelledby="progress-tab">
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>{% trans 'مستوى الإنجاز' %}</span>
+                                    <span class="fw-bold">{{ project.completion_percentage }}%</span>
+                                </div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" 
+                                         style="width: 0%;" 
+                                         data-width="{{ project.completion_percentage|default:0 }}"
+                                         aria-valuenow="{{ project.completion_percentage|default:0 }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">{% trans 'المهام' %}</h6>
+                                    <div class="list-group list-group-flush">
+                                        {% for task in project.tasks.all|slice:":5" %}
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1">{{ task.title }}</h6>
+                                                    <span class="badge bg-{{ task.get_status_class }}">{{ task.get_status_display }}</span>
+                                                </div>
+                                                <p class="mb-1 small text-muted">{{ task.due_date|date:'Y-m-d'|default:'' }}</p>
+                                            </div>
+                                        {% empty %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-info-circle me-2"></i> {% trans 'لا توجد مهام مسجلة لهذا المشروع' %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if project.tasks.count > 5 %}
+                                        <div class="text-center mt-3">
+                                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                                {% trans 'عرض الكل' %} ({{ project.tasks.count }})
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">{% trans 'المستجدات الأخيرة' %}</h6>
+                                    <div class="timeline">
+                                        {% for update in project.updates.all|slice:":3" %}
+                                            <div class="timeline-item">
+                                                <div class="timeline-badge bg-{{ update.get_type_class }}">
+                                                    <i class="fas fa-{{ update.get_type_icon }}"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <h6>{{ update.title }}</h6>
+                                                    <p class="small text-muted">
+                                                        {{ update.date|date:'Y-m-d' }} - {{ update.user.get_full_name|default:update.user.username }}
+                                                    </p>
+                                                    <p class="mb-0">{{ update.description|truncatewords:20 }}</p>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-info-circle me-2"></i> {% trans 'لا توجد مستجدات مسجلة لهذا المشروع' %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if project.updates.count > 3 %}
+                                        <div class="text-center mt-3">
+                                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                                {% trans 'عرض الكل' %} ({{ project.updates.count }})
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    /* RTL Support */
+    body {
+        text-align: right;
+        direction: rtl;
+    }
+    
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        padding-right: 30px;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        right: 9px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-badge {
+        position: absolute;
+        right: -30px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        margin-right: 40px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-right: 3px solid #4DA8DA;
+    }
+    
+    /* Status Badges */
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.8em;
+    }
+    
+    .bg-planned {
+        background-color: #6c757d;
+    }
+    
+    .bg-in-progress {
+        background-color: #17a2b8;
+    }
+    
+    .bg-completed {
+        background-color: #28a745;
+    }
+    
+    .bg-on-hold {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .bg-cancelled {
+        background-color: #dc3545;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .timeline:before {
+            right: 0;
+        }
+        
+        .timeline-badge {
+            right: -20px;
+        }
+        
+        .timeline-content {
+            margin-right: 30px;
+        }
+    }
+    
+    /* Custom Colors */
+    .bg-primary {
+        background-color: #4DA8DA !important;
+    }
+    
+    .bg-success {
+        background-color: #B0DB9C !important;
+    }
+    
+    .bg-info {
+        background-color: #4DA8DA !important;
+    }
+    
+    .bg-secondary {
+        background-color: #6c757d !important;
+    }
+    
+    .bg-warning {
+        background-color: #FFA673 !important;
+    }
+    
+    /* Tab Styling */
+    .nav-tabs .nav-link {
+        color: #495057;
+        border: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #4DA8DA;
+        background: transparent;
+        border-bottom: 3px solid #4DA8DA;
+        font-weight: 600;
+    }
+    
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-color: transparent;
+        color: #4DA8DA;
+    }
+    
+    /* Progress Bar */
+    .progress {
+        border-radius: 10px;
+        height: 10px;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+    }
+    
+    /* Notes Section */
+    .notes-list .card {
+        border-right: 3px solid #4DA8DA;
+    }
+    
+    /* Utility Classes */
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>

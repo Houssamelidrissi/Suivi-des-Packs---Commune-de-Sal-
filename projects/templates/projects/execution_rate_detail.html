@@ -1,0 +1,189 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{% trans 'تفاصيل معدل التنفيذ' %}</h2>
+            <div>
+                <a href="{% url 'projects:execution_rate_edit' execution_rate.pk %}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> {% trans 'تعديل' %}
+                </a>
+                <a href="{% url 'projects:execution_rate_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-right"></i> {% trans 'عودة للقائمة' %}
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Project Information -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4 class="border-bottom pb-2 mb-3">{% trans 'معلومات المشروع' %}</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>{% trans 'الرمز:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.project.code }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>{% trans 'البرنامج:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.project.program }}</p>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <strong>{% trans 'المشاريع:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.project.projects }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Information -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4 class="border-bottom pb-2 mb-3">{% trans 'المعلومات المالية' %}</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'المبلغ المبرمج:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.programmed_amount|default:'-' }} {% trans 'درهم' %}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تعبئة الشركاء:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.partner_contribution|default:'-' }} {% trans 'درهم' %}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'التكاليف الفعلية:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.actual_costs|default:'-' }} {% trans 'درهم' %}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'التكاليف التقديرية:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.estimated_costs|default:'-' }} {% trans 'درهم' %}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'فرق التكلفة:' %}</strong>
+                            <p class="mb-0">
+                                {% if execution_rate.cost_difference_percentage is not None %}
+                                    {{ execution_rate.cost_difference_percentage|floatformat:2 }}%
+                                    <span class="text-{% if execution_rate.cost_difference_percentage > 0 %}success{% else %}danger{% endif %}">
+                                        <i class="fas fa-arrow-{% if execution_rate.cost_difference_percentage > 0 %}down{% else %}up{% endif %}"></i>
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Information -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4 class="border-bottom pb-2 mb-3">{% trans 'معلومات الجدولة' %}</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تاريخ البرمجة:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.programming_date|date:'Y-m-d'|default:'-' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تاريخ إطلاق الصفقات:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.market_launch_date|date:'Y-m-d'|default:'-' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تاريخ البداية الفعلية:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.actual_start_date|date:'Y-m-d'|default:'-' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تاريخ الانتهاء المتوقع:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.expected_end_date|date:'Y-m-d'|default:'-' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'تاريخ الانتهاء الفعلي:' %}</strong>
+                            <p class="mb-0">{{ execution_rate.actual_end_date|date:'Y-m-d'|default:'-' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'فرق المدة (بالأيام):' %}</strong>
+                            <p class="mb-0">
+                                {% if execution_rate.duration_difference_days is not None %}
+                                    {{ execution_rate.duration_difference_days }}
+                                    <span class="text-{% if execution_rate.duration_difference_days <= 0 %}success{% else %}danger{% endif %}">
+                                        <i class="fas fa-arrow-{% if execution_rate.duration_difference_days <= 0 %}down{% else %}up{% endif %}"></i>
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong>{% trans 'معدل التأخير:' %}</strong>
+                            <p class="mb-0">
+                                {% if execution_rate.delay_percentage is not None %}
+                                    {{ execution_rate.delay_percentage|floatformat:2 }}%
+                                    <span class="text-{% if execution_rate.delay_percentage <= 0 %}success{% else %}danger{% endif %}">
+                                        <i class="fas fa-arrow-{% if execution_rate.delay_percentage <= 0 %}down{% else %}up{% endif %}"></i>
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Information -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="border-bottom pb-2 mb-3">{% trans 'معدلات التقدم' %}</h4>
+                    <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title mb-3">{% trans 'معدل التقدم الفعلي للأشغال' %}</h5>
+                                        <span class="badge bg-{% if execution_rate.work_progress_percentage >= 70 %}success{% elif execution_rate.work_progress_percentage >= 40 %}warning{% else %}danger{% endif %} text-dark" 
+                                              style="font-size: 1.5em; padding: 0.75em 1.5em; min-width: 120px;">
+                                            {{ execution_rate.work_progress_percentage|default:0|floatformat:1 }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title mb-3">{% trans 'معدل الإنجاز المالي' %}</h5>
+                                        <span class="badge bg-{% if execution_rate.financial_achievement_percentage >= 70 %}success{% elif execution_rate.financial_achievement_percentage >= 40 %}warning{% else %}danger{% endif %} text-dark" 
+                                              style="font-size: 1.5em; padding: 0.75em 1.5em; min-width: 120px;">
+                                            {{ execution_rate.financial_achievement_percentage|default:0|floatformat:1 }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timestamps -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <hr>
+                    <div class="text-muted small">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if execution_rate.created_by %}
+                                    <div>{% trans 'تم الإنشاء بواسطة:' %} {{ execution_rate.created_by.get_full_name|default:execution_rate.created_by.username }}</div>
+                                {% endif %}
+                                <div>{% trans 'تاريخ الإنشاء:' %} {{ execution_rate.created_at|date:'Y-m-d H:i' }}</div>
+                            </div>
+                            <div class="text-end">
+                                {% if execution_rate.updated_by %}
+                                    <div>{% trans 'آخر تحديث بواسطة:' %} {{ execution_rate.updated_by.get_full_name|default:execution_rate.updated_by.username }}</div>
+                                {% endif %}
+                                <div>{% trans 'آخر تحديث:' %} {{ execution_rate.updated_at|date:'Y-m-d H:i' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{% trans 'معاينة بيانات الاستيراد' %}</h4>
+            <p class="mb-0">{% trans 'الملف:' %} {{ file_name }} | {% trans 'إجمالي الصفوف:' %} {{ total_rows }}</p>
+        </div>
+        
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            {% for header in headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in preview_data %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td>{{ cell|default:'' }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4 d-flex justify-content-between">
+                <form method="post" enctype="multipart/form-data" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="file" value="{{ file_name }}">
+                    <button type="submit" name="confirm_import" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> {% trans 'تأكيد الاستيراد' %}
+                    </button>
+                </form>
+                
+                <a href="{% url 'projects:project_import' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> {% trans 'العودة' %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

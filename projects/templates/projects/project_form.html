@@ -1,0 +1,607 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+{% load form_utils %}
+
+{% block title %}{% if form.instance.pk %}{% trans 'تعديل المشروع' %}{% else %}{% trans 'إضافة مشروع جديد' %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            {% if form.instance.pk %}
+                <i class="fas fa-edit me-2"></i> {% trans 'تعديل المشروع' %}
+            {% else %}
+                <i class="fas fa-plus-circle me-2"></i> {% trans 'إضافة مشروع جديد' %}
+            {% endif %}
+        </h5>
+    </div>
+    
+    <div class="card-body">
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">{% trans 'حدثت الأخطاء التالية' %}</h5>
+            <ul class="mb-0">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>
+                            <strong>{{ form|get_field_label:field }}:</strong> 
+                            {{ error }}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">
+                        <i class="fas fa-info-circle me-1"></i> {% trans 'المعلومات الأساسية' %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">
+                        <i class="fas fa-clipboard-list me-1"></i> {% trans 'تفاصيل المشروع' %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="financial-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="financial" aria-selected="false">
+                        <i class="fas fa-money-bill-wave me-1"></i> {% trans 'المعلومات المالية' %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab" aria-controls="other" aria-selected="false">
+                        <i class="fas fa-ellipsis-h me-1"></i> {% trans 'معلومات إضافية' %}
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="projectTabsContent">
+                <!-- Basic Information Tab -->
+                <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.code.id_for_label }}" class="form-label">
+                                {{ form.code.label }}
+                                {% if form.code.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.code }}
+                            <div class="invalid-feedback">
+                                {{ form.code.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.program.id_for_label }}" class="form-label">
+                                {{ form.program.label }}
+                                {% if form.program.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.program }}
+                            <div class="invalid-feedback">
+                                {{ form.program.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.projects.id_for_label }}" class="form-label">
+                                {{ form.projects.label }}
+                                {% if form.projects.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.projects }}
+                            <div class="invalid-feedback">
+                                {{ form.projects.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">
+                                {% trans 'موقع المشروع' %}
+                                {% if form.location.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.location }}
+                            <div class="invalid-feedback">
+                                {{ form.location.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.district.id_for_label }}" class="form-label">
+                                {{ form.district.label }}
+                                {% if form.district.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.district }}
+                            <div class="invalid-feedback">
+                                {{ form.district.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.planning_code.id_for_label }}" class="form-label">
+                                {{ form.planning_code.label }}
+                                {% if form.planning_code.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.planning_code }}
+                            <div class="invalid-feedback">
+                                {{ form.planning_code.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.area.id_for_label }}" class="form-label">
+                                {{ form.area.label }}
+                                {% if form.area.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                {{ form.area }}
+                                <span class="input-group-text">م²</span>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.area.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.development_goals.id_for_label }}" class="form-label">
+                                {{ form.development_goals.label }}
+                                {% if form.development_goals.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.development_goals }}
+                            {% if form.development_goals.help_text %}
+                                <div class="form-text">{{ form.development_goals.help_text }}</div>
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                {{ form.development_goals.errors|join:", " }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project Details Tab -->
+                <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.components.id_for_label }}" class="form-label">
+                                {{ form.components.label }}
+                                {% if form.components.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.components }}
+                            <div class="invalid-feedback">
+                                {{ form.components.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.target_group.id_for_label }}" class="form-label">
+                                {{ form.target_group.label }}
+                                {% if form.target_group.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.target_group }}
+                            <div class="invalid-feedback">
+                                {{ form.target_group.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.project_goals.id_for_label }}" class="form-label">
+                                {{ form.project_goals.label }}
+                                {% if form.project_goals.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.project_goals }}
+                            {% if form.project_goals.help_text %}
+                                <div class="form-text">{{ form.project_goals.help_text }}</div>
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                {{ form.project_goals.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.property_status.id_for_label }}" class="form-label">
+                                {{ form.property_status.label }}
+                                {% if form.property_status.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.property_status }}
+                            <div class="invalid-feedback">
+                                {{ form.property_status.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.property_drawing.id_for_label }}" class="form-label">
+                                {{ form.property_drawing.label }}
+                                {% if form.property_drawing.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.property_drawing }}
+                            <div class="invalid-feedback">
+                                {{ form.property_drawing.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                
+                <!-- Financial Information Tab -->
+                <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="financial-tab">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.property_prep_cost.id_for_label }}" class="form-label">
+                                {{ form.property_prep_cost.label }}
+                                {% if form.property_prep_cost.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                {{ form.property_prep_cost }}
+                                <span class="input-group-text">درهم</span>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.property_prep_cost.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.studies.id_for_label }}" class="form-label">
+                                {{ form.studies.label }}
+                                {% if form.studies.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                {{ form.studies }}
+                                <span class="input-group-text">درهم</span>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.studies.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.achievements.id_for_label }}" class="form-label">
+                                {{ form.achievements.label }}
+                                {% if form.achievements.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                {{ form.achievements }}
+                                <span class="input-group-text">درهم</span>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.achievements.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">
+                                الكلفة التقديرية الإجمالية للمشروع
+                            </label>
+                            <div class="input-group">
+                                <input type="text" id="total_estimated_cost" class="form-control" value="0.00" readonly>
+                                <span class="input-group-text">درهم</span>
+                            </div>
+                            <div class="form-text">
+                                (مجموع الدراسات + الإنجازات + كلفة تعبئة العقار)
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.estimated_cost.id_for_label }}" class="form-label fw-bold">
+                                {{ form.estimated_cost.label }}
+                                {% if form.estimated_cost.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                <input type="number" 
+                                       id="{{ form.estimated_cost.id_for_label }}" 
+                                       name="{{ form.estimated_cost.name }}" 
+                                       value="{{ form.estimated_cost.value|default:'' }}" 
+                                       class="form-control text-end" 
+                                       step="0.01" 
+                                       min="0" 
+                                       required 
+                                       dir="ltr"
+                                       {% if form.estimated_cost.field.disabled %}disabled{% endif %}>
+                                <span class="input-group-text">درهم</span>
+                            </div>
+                            <div class="form-text">
+                                (يتم حساب القيمة التلقائية: <span id="auto_calculated_cost">0.00</span> درهم)
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.estimated_cost.errors|join:", " }}
+                                {% if form.estimated_cost.help_text %}
+                                    <div class="help-text">{{ form.estimated_cost.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.start_year.id_for_label }}" class="form-label">
+                                {{ form.start_year.label }}
+                                {% if form.start_year.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.start_year }}
+                            <div class="invalid-feedback">
+                                {{ form.start_year.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.estimated_duration.id_for_label }}" class="form-label">
+                                {{ form.estimated_duration.label }}
+                                {% if form.estimated_duration.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                {{ form.estimated_duration }}
+                                <span class="input-group-text">شهر</span>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form.estimated_duration.errors|join:", " }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Information Tab -->
+                <div class="tab-pane fade" id="other" role="tabpanel" aria-labelledby="other-tab">
+                    <div class="row">
+
+                        
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">{{ form.implementation_years.label }}</h6>
+                                    {% if form.implementation_years.field.required %}<span class="text-danger">*</span>{% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for choice in form.implementation_years %}
+                                            <div class="col-md-3 col-6 mb-2">
+                                                <div class="form-check form-check-inline">
+                                                    {{ choice.tag }}
+                                                    <label class="form-check-label me-3" for="{{ choice.id_for_label }}">
+                                                        {{ choice.choice_label }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if form.implementation_years.errors %}
+                                        <div class="text-danger mt-2">
+                                            {{ form.implementation_years.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">{{ form.budget_years.label }}</h6>
+                                    {% if form.budget_years.field.required %}<span class="text-danger">*</span>{% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for choice in form.budget_years %}
+                                            <div class="col-md-3 col-6 mb-2">
+                                                <div class="form-check form-check-inline">
+                                                    {{ choice.tag }}
+                                                    <label class="form-check-label me-3" for="{{ choice.id_for_label }}">
+                                                        {{ choice.choice_label }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if form.budget_years.errors %}
+                                        <div class="text-danger mt-2">
+                                            {{ form.budget_years.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.indicator_1.id_for_label }}" class="form-label">
+                                {{ form.indicator_1.label }}
+                                {% if form.indicator_1.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.indicator_1 }}
+                            <div class="invalid-feedback">
+                                {{ form.indicator_1.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.indicator_2.id_for_label }}" class="form-label">
+                                {{ form.indicator_2.label }}
+                                {% if form.indicator_2.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.indicator_2 }}
+                            <div class="invalid-feedback">
+                                {{ form.indicator_2.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.indicator_3.id_for_label }}" class="form-label">
+                                {{ form.indicator_3.label }}
+                                {% if form.indicator_3.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.indicator_3 }}
+                            <div class="invalid-feedback">
+                                {{ form.indicator_3.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.potential_partners.id_for_label }}" class="form-label">
+                                {{ form.potential_partners.label }}
+                                {% if form.potential_partners.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.potential_partners }}
+                            <div class="form-text">{% trans 'يمكنك إضافة أكثر من شريك في سطر مستقل' %}</div>
+                            <div class="invalid-feedback">
+                                {{ form.potential_partners.errors|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.funding_sources.id_for_label }}" class="form-label">
+                                {{ form.funding_sources.label }}
+                                {% if form.funding_sources.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.funding_sources }}
+                            <div class="form-text">{% trans 'يمكنك إضافة أكثر من مصدر تمويل في سطر مستقل' %}</div>
+                            <div class="invalid-feedback">
+                                {{ form.funding_sources.errors|join:", " }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'projects:project_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-1"></i> {% trans 'عودة للقائمة' %}
+                </a>
+                <div>
+                    <button type="reset" class="btn btn-warning me-2">
+                        <i class="fas fa-undo me-1"></i> {% trans 'إعادة تعيين' %}
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {% if form.instance.pk %}{% trans 'حفظ التعديلات' %}{% else %}{% trans 'حفظ المشروع' %}{% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Function to calculate and update the total
+function updateTotalCost() {
+    // Get the input values
+    const propertyPrepCost = parseFloat(document.getElementById('{{ form.property_prep_cost.id_for_label }}').value) || 0;
+    const studies = parseFloat(document.getElementById('{{ form.studies.id_for_label }}').value) || 0;
+    const achievements = parseFloat(document.getElementById('{{ form.achievements.id_for_label }}').value) || 0;
+    
+    // Calculate the total
+    const total = propertyPrepCost + studies + achievements;
+    
+    // Update the total field (readonly display)
+    const totalDisplay = document.getElementById('total_estimated_cost');
+    if (totalDisplay) {
+        totalDisplay.value = total.toFixed(2);
+    }
+    
+    // Update the auto-calculated cost display
+    const autoCalculatedSpan = document.getElementById('auto_calculated_cost');
+    if (autoCalculatedSpan) {
+        autoCalculatedSpan.textContent = total.toFixed(2);
+    }
+    
+    // If the estimated cost is empty or matches the previous total, update it
+    const estimatedCostInput = document.getElementById('{{ form.estimated_cost.id_for_label }}');
+    if (estimatedCostInput) {
+        const currentValue = parseFloat(estimatedCostInput.value) || 0;
+        const previousTotal = parseFloat(estimatedCostInput.dataset.previousTotal) || 0;
+        
+        // Update the previous total in the dataset
+        estimatedCostInput.dataset.previousTotal = total.toFixed(2);
+        
+        // Only auto-update if the field is empty or matches the previous total
+        if (estimatedCostInput.value === '' || Math.abs(currentValue - previousTotal) < 0.01) {
+            estimatedCostInput.value = total.toFixed(2);
+        }
+    }
+    
+    return total;
+}
+
+// Add event listeners when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the input fields
+    const propertyPrepInput = document.getElementById('{{ form.property_prep_cost.id_for_label }}');
+    const studiesInput = document.getElementById('{{ form.studies.id_for_label }}');
+    const achievementsInput = document.getElementById('{{ form.achievements.id_for_label }}');
+    const estimatedCostInput = document.getElementById('{{ form.estimated_cost.id_for_label }}');
+    
+    // Add input event listeners for auto-calculation
+    if (propertyPrepInput) propertyPrepInput.addEventListener('input', updateTotalCost);
+    if (studiesInput) studiesInput.addEventListener('input', updateTotalCost);
+    if (achievementsInput) achievementsInput.addEventListener('input', updateTotalCost);
+    
+    // Format number inputs to show 2 decimal places
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+        // Set step to allow decimal places
+        input.step = '0.01';
+        
+        // Format on blur
+        input.addEventListener('blur', function() {
+            if (this.value) {
+                this.value = parseFloat(this.value).toFixed(2);
+            }
+        });
+    });
+    
+    // Initial calculation
+    const initialTotal = updateTotalCost();
+    
+    // Initialize the previous total in the dataset
+    if (estimatedCostInput) {
+        estimatedCostInput.dataset.previousTotal = initialTotal.toFixed(2);
+    }
+});
+
+// Enable form validation
+(function () {
+    'use strict'
+    
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Show active tab on page reload
+var triggerTabList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'))
+triggerTabList.forEach(function (triggerEl) {
+    var tabTrigger = new bootstrap.Tab(triggerEl)
+    
+    triggerEl.addEventListener('click', function (event) {
+        event.preventDefault()
+        tabTrigger.show()
+    })
+})
+
+// Save the active tab to local storage
+$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+    localStorage.setItem('activeTab', $(e.target).attr('href'));
+});
+
+// Retrieve the active tab from local storage
+var activeTab = localStorage.getItem('activeTab');
+if (activeTab) {
+    var tab = new bootstrap.Tab(document.querySelector('[href="' + activeTab + '"]'));
+    tab.show();
+}
+
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+</script>
+{% endblock %}

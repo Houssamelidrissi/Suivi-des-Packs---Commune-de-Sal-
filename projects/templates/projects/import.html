@@ -1,0 +1,97 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% trans "استيراد مشاريع من ملف Excel" %}</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans "يرجى تحميل ملف Excel يحتوي على بيانات المشاريع. يجب أن يتطابق تنسيق الأعمدة مع تنسيق ملف التصدير." %}
+                        <a href="{% url 'projects:export_projects' %}" class="alert-link">
+                            {% trans "تحميل نموذج" %}
+                        </a>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="file" class="form-label">{% trans "اختر ملف Excel" %}</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".xls,.xlsx" required>
+                            <div class="form-text">{% trans "يجب أن يكون الملف من نوع XLS أو XLSX" %}</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <div>
+                                <a href="{% url 'projects:project_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-right me-1"></i> {% trans "عودة للقائمة" %}
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" name="preview" class="btn btn-info me-2">
+                                    <i class="fas fa-eye me-1"></i> {% trans "معاينة" %}
+                                </button>
+                                <button type="submit" name="import" class="btn btn-primary">
+                                    <i class="fas fa-upload me-1"></i> {% trans "استيراد مباشر" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* RTL specific styles */
+    html[dir="rtl"] .form-text {
+        text-align: right;
+    }
+    
+    /* File input styling */
+    .form-control:focus {
+        border-color: #4DA8DA;
+        box-shadow: 0 0 0 0.25rem rgba(77, 168, 218, 0.25);
+    }
+    
+    /* Button styling */
+    .btn-primary {
+        background-color: #4DA8DA;
+        border-color: #4DA8DA;
+    }
+    
+    .btn-primary:hover {
+        background-color: #3d8fc6;
+        border-color: #3d8fc6;
+    }
+    
+    /* Card styling */
+    .card {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-header {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

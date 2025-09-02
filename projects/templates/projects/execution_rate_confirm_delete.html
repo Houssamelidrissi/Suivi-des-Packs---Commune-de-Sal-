@@ -1,0 +1,53 @@
+{% extends 'projects/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">{% trans 'تأكيد الحذف' %}</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        {% blocktrans with project=object.project.code %}
+                        هل أنت متأكد من رغبتك في حذف سجل معدل التنفيذ للمشروع <strong>{{ project }}</strong>؟
+                        {% endblocktrans %}
+                    </p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {% trans 'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع البيانات المرتبطة بهذا السجل بشكل دائم.' %}
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{% trans 'تفاصيل السجل' %}</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>{% trans 'المشروع:' %}</strong> {{ object.project.program }}</li>
+                                <li><strong>{% trans 'تاريخ الإنشاء:' %}</strong> {{ object.created_at|date:'Y-m-d' }}</li>
+                                <li><strong>{% trans 'آخر تحديث:' %}</strong> {{ object.updated_at|date:'Y-m-d H:i' }}</li>
+                                <li><strong>{% trans 'معدل التقدم:' %}</strong> {{ object.work_progress_percentage|default:'0'|floatformat:1 }}%</li>
+                                <li><strong>{% trans 'معدل الإنجاز المالي:' %}</strong> {{ object.financial_achievement_percentage|default:'0'|floatformat:1 }}%</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'projects:execution_rate_detail' object.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-right me-1"></i> {% trans 'إلغاء والعودة للتفاصيل' %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> {% trans 'نعم، احذف السجل' %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

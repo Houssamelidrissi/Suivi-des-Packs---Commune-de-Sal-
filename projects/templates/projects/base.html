@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - نظام إدارة المشاريع</title>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={{ cache_buster|default:'' }}">
+    <link rel="icon" href="{% static 'img/logo.png' %}" />
+
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header text-center py-3">
+                <h4 class="mb-0">نظام إدارة المشاريع</h4>
+            </div>
+            
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'projects:home' %}">
+                        <i class="fas fa-home me-2"></i>الرئيسية
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" href="{% url 'projects:project_list' %}">
+                        <i class="fas fa-list me-2"></i>عرض المشاريع
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'project_create' %}active{% endif %}" href="{% url 'projects:project_create' %}">
+                        <i class="fas fa-plus-circle me-2"></i>إضافة مشروع جديد
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <h6 class="px-3 text-muted text-uppercase small fw-bold">معدل التنفيذ</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'execution_rate' in request.resolver_match.url_name and not 'create' in request.resolver_match.url_name %}active{% endif %}" 
+                       href="{% url 'projects:execution_rate_list' %}">
+                        <i class="fas fa-list me-2"></i>عرض معدلات التنفيذ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'execution_rate_create' in request.resolver_match.url_name %}active{% endif %}" 
+                       href="{% url 'projects:execution_rate_create' %}">
+                        <i class="fas fa-plus-circle me-2"></i>إضافة معدل تنفيذ
+                    </a>
+                </li>
+
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="text-center py-2">
+                    <small>© {% now "Y" %} جميع الحقوق محفوظة</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+        
+            
+            <!-- Page Content -->
+            <main class="container-fluid py-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}?v={{ cache_buster|default:'' }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
